@@ -89,10 +89,10 @@ void Minus(BigInt *result, BigInt a, BigInt b) {
         if (digit < 0) {
             result->data[i] = (10 + digit) % 10;
             inBrain = -1;
-            continue;
+        } else {
+            result->data[i] = digit;
+            inBrain = 0;
         }
-        result->data[i] = digit;
-        inBrain = 0;
         if (result->data[i] > 0) {
             lastIndex = i;
         }
@@ -206,11 +206,11 @@ void Divide(BigInt *result, BigInt a, BigInt b) {
             Minus(&v, tmp, multiplyTable[index]);
             printf("=\n");
             PrintBigInt(v);
-            for (int i = 0; i < v.size; ++i) {
+            for (int i = 0; i < tmp.size; ++i) {
                 a.data[end + i] = v.data[i];
             }
             end -= 1;
-            begin -= 1;
+            begin = end + v.size;
         }
     }
     for (int i = j; i >= 0; --i) {
@@ -260,20 +260,22 @@ int main(int argc, char *argv[]) {
 void test() {
     BigInt a, b;
     InitBigInt(&a);
-    FromString(&a, "1234", 4);
+    FromString(&a, "11970", 5);
     InitBigInt(&b);
-    FromString(&b, "963", 3);
+    FromString(&b, "8362", 4);
     BigInt value;
     InitBigInt(&value);
     Minus(&value, a, b);
     PrintBigInt(value);
-    // BigInt a, b;
-    // InitBigInt(&a);
-    // FromString(&a, "1234567890", 10);
-    // InitBigInt(&b);
-    // FromString(&b, "321", 3);
-    // Divide(&a, a, b);
-    // PrintBigInt(a);
+
+    printf("-----\n");
+
+    InitBigInt(&a);
+    FromString(&a, "1234567890", 10);
+    InitBigInt(&b);
+    FromString(&b, "321", 3);
+    Divide(&a, a, b);
+    PrintBigInt(a);
     /*
     BigInt a;
     InitBigInt(&a);
