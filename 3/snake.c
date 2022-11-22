@@ -132,9 +132,6 @@ int main() {
         getchar();
         int x = snake.Head->X;
         int y = snake.Head->Y;
-        if ((cmd + 2) % 2 == prev % 2) {
-            printf("%d\n", cmd);
-        }
         GetVector(&x, &y, cmd, prev);
         prev = cmd;
         if (!InBox(x, y, N, M)) {
@@ -151,7 +148,6 @@ int main() {
             UpdateBerry(&bX, &bY, N, M, &snake);
         }
         SwapHead(&snake, x, y);
-        PrintGame(N, M, &snake, bX, bY);
     }
     printf("%d\n", snake.Size);
     return 0;

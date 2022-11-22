@@ -194,18 +194,19 @@ void Divide(BigInt *result, BigInt a, BigInt b) {
                     index = mult;
                 }
             }
-            res[j] = index + 1;
+            printf("index = %d\n", index);
+            res[j] = index;
             j++;
             // printf("choose - ");
             // PrintBigInt(multiplyTable[index]);
             // printf("%d - index", index);
-            PrintBigInt(tmp);
-            printf("-\n");
-            PrintBigInt(multiplyTable[index]);
+            // PrintBigInt(tmp);
+            // printf("-\n");
+            // PrintBigInt(multiplyTable[index]);
             BigInt v;
             Minus(&v, tmp, multiplyTable[index]);
             printf("=\n");
-            PrintBigInt(v);
+            // PrintBigInt(v);
             for (int i = 0; i < tmp.size; ++i) {
                 a.data[end + i] = v.data[i];
             }
@@ -213,8 +214,11 @@ void Divide(BigInt *result, BigInt a, BigInt b) {
             begin = end + v.size;
         }
     }
-    for (int i = j; i >= 0; --i) {
-        result->data[i] = res[i];
+    for (int i = 0; i <= j; ++i) {
+        printf("%d\n", res[i]);
+    }
+    for (int i = 0; i <= j; ++i) {
+        result->data[i] = res[j - i];
     }
     result->size = j + 1;
 }
@@ -228,10 +232,11 @@ int main(int argc, char *argv[]) {
     InitBigInt(&data[2]);
     FromString(&data[0], "0", 1);
     FromString(&data[1], "1", 1);
-    if (argc > 1) {
-        test();
-        return 0;
-    }
+    //
+    // if (argc > 1) {
+    //     test();
+    //     return 0;
+    // }
 
     // Найдем какое-то большое Fn+1
     for (int i = 2; i < 50000 + 1;
@@ -245,8 +250,8 @@ int main(int argc, char *argv[]) {
 
     // Умножим на 1000 data[2], чтобы не делать арифметику плавающей точки
     Shift(&data[2], 1000); // 10 ^ 1000 -сдвиг на 1000 десятичных разрядов
-    PrintBigInt(data[2]);
 
+    // До этого шага все работает верно!
     // PrintBigInt(data[2]);
     printf("\n");
     BigInt value;

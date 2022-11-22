@@ -10,23 +10,12 @@ int F(int value, int position, int seed) {
 }
 
 int TyanochkuHocheca(int *data, int *value, int index, int size, int seed,
-                     int *count) {
-    // printf("index = %d\n", index);
-    // printf("size = %d\n", size);
+                     int **d, int *count) {
+    // printf("index = %d\n");
+    if (*count >= 5) {
+        return 0;
+    }
     if (index >= size) {
-        /*
-        int *answer = (int *)malloc(sizeof(int) * size);
-        for (int i = 0; i < size; ++i) {
-            answer[i] = F(value[i], i, seed);
-        }
-        for (int i = 0; i < size; ++i) {
-            if (answer[i] != data[i]) {
-                free(answer);
-                return 0;
-            }
-        }
-        */
-        // Cool, we find this!
         *count += 1;
         for (int i = 0; i < size; ++i) {
             printf("%d", value[i]);
@@ -35,13 +24,12 @@ int TyanochkuHocheca(int *data, int *value, int index, int size, int seed,
         return 1;
     }
     int answer = 0;
+    int k = 0;
     for (int i = 9; i >= 0; --i) {
         value[index] = i;
-        if (F(value[index], index, seed) == data[index] && *count < 5) {
-            //      printf("F -> %d\n", i);
-            //    printf("data[index] -> %d\n", data[index]);
-            answer |=
-                TyanochkuHocheca(data, value, index + 1, size, seed, count);
+        if (d[index][i] == data[index]) {
+            k = TyanochkuHocheca(data, value, index + 1, size, seed, d, count);
+            answer |= k;
         }
     }
     return answer;
@@ -52,6 +40,15 @@ int main() {
     char *B = (char *)malloc(sizeof(char) * n);
     scanf("%d %d", &n, &seed);
     getchar();
+    int **d = (int **)malloc(sizeof(int *) * n);
+    for (int i = 0; i < n; ++i) {
+        d[i] = (int *)malloc(sizeof(int) * 10);
+        for (int j = 10; j >= 0; --j) {
+            d[i][j] = F(j, i, seed);
+            // printf("%d ", d[i][j]);
+        }
+        // printf("\n");
+    }
     int *data = (int *)malloc(sizeof(int) * n);
     int *value = (int *)malloc(sizeof(int) * n);
     for (int i = 0; i < n; ++i) {
@@ -59,7 +56,8 @@ int main() {
     }
 
     int count = 0;
-    if (!TyanochkuHocheca(data, value, 0, n, seed, &count)) {
+    int index = 0;
+    if (!TyanochkuHocheca(data, value, index, n, seed, d, &count)) {
         printf("No solutions\n");
     }
 
