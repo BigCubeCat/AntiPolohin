@@ -56,48 +56,53 @@ void Shift(BigInt *number, int shift) {
 
 /*
  * Plus
- * writes a + b to result
+ * return a + b
  */
-void Plus(BigInt *result, BigInt a, BigInt b) {
+BigInt Plus(BigInt a, BigInt b) {
     // TODO
+    BigInt result;
     int maximum = max(a.size, b.size);
     int inBrain = 0;
     int digit;
     for (int i = 0; i < maximum; ++i) {
         digit = a.data[i] + b.data[i] + inBrain;
-        result->data[i] = digit % 10;
+        result.data[i] = digit % 10;
         inBrain = (digit > 9) ? digit / 10 : 0;
     }
-    result->size = maximum;
+    result.size = maximum;
     if (inBrain) {
-        result->data[maximum] = inBrain;
-        ++result->size;
+        result.data[maximum] = inBrain;
+        ++result.size;
     }
+    return result;
 }
 
 /*
  * Minus
- * writes a - b to result
+ * return a - b
  * !important (a >= b)
  */
-void Minus(BigInt *result, BigInt a, BigInt b) {
+BigInt Minus(BigInt a, BigInt b) {
     int inBrain = 0;
     int digit;
     int lastIndex = 0;
+    BigInt result;
+    InitBigInt(&result);
     for (int i = 0; i < a.size; ++i) {
         digit = inBrain + a.data[i] - b.data[i];
         if (digit < 0) {
-            result->data[i] = (10 + digit) % 10;
+            result.data[i] = (10 + digit) % 10;
             inBrain = -1;
         } else {
-            result->data[i] = digit;
+            result.data[i] = digit;
             inBrain = 0;
         }
-        if (result->data[i] > 0) {
+        if (result.data[i] > 0) {
             lastIndex = i;
         }
     }
-    result->size = lastIndex + 1;
+    result.size = lastIndex + 1;
+    return result;
 }
 
 /*
@@ -110,7 +115,7 @@ void MultiplyTable(BigInt *table, BigInt number) {
     InitBigInt(&value);
     for (int i = 0; i < 10; ++i) {
         table[i] = value;
-        Plus(&value, value, number);
+        value = Plus(value, number);
     }
 }
 
@@ -152,75 +157,63 @@ int CompareBigInt(BigInt a, BigInt b) {
 
 /*
  * Divide
- * print a / b to result
+ * return a / b
  */
-void Divide(BigInt *result, BigInt a, BigInt b) {
+BigInt Divide(BigInt a, BigInt b) {
+    // Осталось убрать один 0 справа
+    BigInt result;
+    int res[INT_SIZE];
+    int j = 0;
+
     if (a.size < b.size) {
-        result->size = 0;
-        result->data[0] = 0;
-        return;
+        result.size = 0;
+        result.data[0] = 0;
+        return result;
     }
 
     BigInt multiplyTable[10];
     MultiplyTable(multiplyTable, b);
 
-    int begin, end;
-    begin = a.size - 1;
-    end = begin - b.size + 1;
+    int end;
+    end = a.size - b.size;
 
-    BigInt tmp, value;
-    int res[INT_SIZE];
-    int j = 0;
+    BigInt tmp;
+    tmp.size = b.size;
+    for (int i = a.size - 1; i >= a.size - b.size; --i) {
+        tmp.data[b.size + i - a.size] = a.data[i];
+    }
+    int isStarted = 0;
     while (end >= 0) {
         // copy digits to temp number
-        CopyByDigits(&tmp, a, end, begin);
         int k = CompareBigInt(tmp, b);
         if (k == -1) {
             res[j] = 0;
             j++;
-            end -= 1;
+            Shift(&tmp, 1);
+            end--;
+            tmp.data[0] = a.data[end];
         } else {
-            printf("begin, end = %d, %d\n", begin, end);
-            // calculating value by MultiplyTable
             int index = 0;
-            // printf("tmp = ");
-            // PrintBigInt(tmp);
             for (int mult = 0; mult < 10; ++mult) {
-                // PrintBigInt(multiplyTable[mult]);
-                // printf("compare result = %d \n",
-                //        CompareBigInt(multiplyTable[mult], tmp));
                 if (CompareBigInt(multiplyTable[mult], tmp) < 1) {
-                    // printf("here, index = %d\n", index);
                     index = mult;
+                } else {
+                    break;
                 }
             }
-            printf("index = %d\n", index);
             res[j] = index;
             j++;
-            // printf("choose - ");
-            // PrintBigInt(multiplyTable[index]);
-            // printf("%d - index", index);
-            // PrintBigInt(tmp);
-            // printf("-\n");
-            // PrintBigInt(multiplyTable[index]);
-            BigInt v;
-            Minus(&v, tmp, multiplyTable[index]);
-            printf("=\n");
-            // PrintBigInt(v);
-            for (int i = 0; i < tmp.size; ++i) {
-                a.data[end + i] = v.data[i];
-            }
-            end -= 1;
-            begin = end + v.size;
+            tmp = Minus(tmp, multiplyTable[index]);
+            Shift(&tmp, 1);
+            end--;
+            tmp.data[0] = a.data[end];
         }
     }
     for (int i = 0; i <= j; ++i) {
-        printf("%d\n", res[i]);
+        result.data[i] = res[j - i - 1];
     }
-    for (int i = 0; i <= j; ++i) {
-        result->data[i] = res[j - i];
-    }
-    result->size = j + 1;
+    result.size = j - 1;
+    return result;
 }
 
 int main(int argc, char *argv[]) {
@@ -232,7 +225,7 @@ int main(int argc, char *argv[]) {
     InitBigInt(&data[2]);
     FromString(&data[0], "0", 1);
     FromString(&data[1], "1", 1);
-    //
+
     // if (argc > 1) {
     //     test();
     //     return 0;
@@ -242,7 +235,7 @@ int main(int argc, char *argv[]) {
     for (int i = 2; i < 50000 + 1;
          ++i) { // 50000 - достаточно большое, но не выходит за границы. %3 == 2
         // => data[2] - наибольшее
-        Plus(&data[i % 3], data[(i + 1) % 3], data[(i + 2) % 3]);
+        data[i % 3] = Plus(data[(i + 1) % 3], data[(i + 2) % 3]);
     }
     // PrintBigInt(data[2]);
     // printf("\n");
@@ -251,13 +244,15 @@ int main(int argc, char *argv[]) {
     // Умножим на 1000 data[2], чтобы не делать арифметику плавающей точки
     Shift(&data[2], 1000); // 10 ^ 1000 -сдвиг на 1000 десятичных разрядов
 
-    // До этого шага все работает верно!
     // PrintBigInt(data[2]);
-    printf("\n");
+    // До этого шага все работает верно!
     BigInt value;
     InitBigInt(&value);
-    Divide(&value, data[2], data[1]);
-    // PrintBigInt(value);
+    value = Divide(data[2], data[1]);
+    value.data[value.size - 1] = 0;
+    value.size -= 1;
+    printf("1.");
+    PrintBigInt(value);
 
     return 0;
 }
@@ -265,21 +260,17 @@ int main(int argc, char *argv[]) {
 void test() {
     BigInt a, b;
     InitBigInt(&a);
-    FromString(&a, "11970", 5);
+    FromString(&a, "1234", 4);
     InitBigInt(&b);
-    FromString(&b, "8362", 4);
-    BigInt value;
-    InitBigInt(&value);
-    Minus(&value, a, b);
+    FromString(&b, "963", 3);
+    BigInt value = Minus(a, b);
     PrintBigInt(value);
-
-    printf("-----\n");
 
     InitBigInt(&a);
     FromString(&a, "1234567890", 10);
     InitBigInt(&b);
     FromString(&b, "321", 3);
-    Divide(&a, a, b);
+    a = Divide(a, b);
     PrintBigInt(a);
     /*
     BigInt a;
