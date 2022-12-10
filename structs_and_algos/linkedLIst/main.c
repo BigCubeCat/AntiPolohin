@@ -1,4 +1,3 @@
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -29,12 +28,13 @@ void InitList(struct TList *list) {
  */
 void AddValue(struct TList *list, int value) {
     if (list->Tail) { // list not empty
-        list->Tail->Next = (struct TListNode *) malloc(sizeof(struct TListNode));
+        list->Tail->Next = (struct TListNode *)malloc(sizeof(struct TListNode));
         list->Tail = list->Tail->Next;
         list->Tail->value = value;
         list->Tail->Next = NULL;
     } else {
-        list->Head = list->Tail = (struct TListNode *) malloc(sizeof(struct TListNode));
+        list->Head = list->Tail =
+            (struct TListNode *)malloc(sizeof(struct TListNode));
         list->Head->value = value;
         list->Head->Next = NULL;
     }
@@ -60,7 +60,7 @@ int RemoveValue(struct TList *list, int index) {
         return 1;
     }
     struct TListNode *current = list->Head;
-    for (int i = 0 ; i < index - 1; ++i)  {
+    for (int i = 0; i < index - 1; ++i) {
         current = current->Next;
     }
     struct TListNode *deletableElement = current->Next;
@@ -78,7 +78,7 @@ int RemoveValue(struct TList *list, int index) {
  */
 void PrintList(struct TList *list) {
     if (list->Head) { // list not empty
-        struct TListNode* current = list->Head;
+        struct TListNode *current = list->Head;
         printf("%d ", current->value);
         while (current->Next) {
             current = current->Next;
@@ -98,12 +98,11 @@ int GetListValue(struct TList *list, int index) {
     if (index == 0) {
         return list->Head->value;
     }
-    struct TListNode* current = list->Head;
+    struct TListNode *current = list->Head;
     for (int i = 0; i < index - 1; ++i) {
         current = current->Next;
     }
     return current->Next->value;
-    
 }
 
 int main() {
@@ -114,13 +113,15 @@ int main() {
 
     AddValue(&list, 5);
     PrintList(&list); // 5
-    RemoveValue(&list, 0); PrintList(&list); // 6
+    RemoveValue(&list, 0);
+    PrintList(&list); // 6
     AddValue(&list, 6);
     AddValue(&list, 8);
     AddValue(&list, 7);
     PrintList(&list); // 5 6
 
-    RemoveValue(&list, 0); PrintList(&list); // 6
+    RemoveValue(&list, 0);
+    PrintList(&list); // 6
 
     return 0;
 }
