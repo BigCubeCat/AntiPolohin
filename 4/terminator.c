@@ -43,6 +43,7 @@ void Push(Stack *list, int value) {
 void PrintStack(Stack stack) {
     struct Node *current = stack.Head;
     if (!current) {
+        printf("\n");
         return;
     }
     printf("%d ", current->value);
@@ -55,16 +56,6 @@ void PrintStack(Stack stack) {
 
 int GetLast(Stack *list) {
     if (list->size <= 0) {
-        if (list->type == 1) {
-
-            int k = 10;
-            for (int i = 0; i < 10; ++i) {
-                k--;
-            }
-            printf("%d", k);
-        } else {
-            printf("No values\n");
-        }
         return 0;
     }
     int answer = list->Tail->value;
@@ -99,7 +90,12 @@ int main() {
         }
         n++;
     }
-    if (Calc(input, n)) {
+    int result = Calc(input, n);
+    if (result == -1) {
+        printf("f\n");
+        return 0;
+    }
+    if (result) {
         printf("t\n");
     } else {
         printf("f\n");
@@ -143,9 +139,6 @@ int Calc(char *input, int n) {
     InitStack(&bracketsStack);
 
     for (int i = 0; i < n; ++i) {
-        // printf("input[%d] = %c;\n", i, input[i]);
-        // printf("boolStack = ");
-        // PrintStack(boolStack);
         if (input[i] == '(') {
             Push(&bracketsStack, (int)'(');
         } else if (input[i] == ')' || input[i] == ',') {
@@ -156,6 +149,9 @@ int Calc(char *input, int n) {
             }
             // Exec function
             int a = Pop(&boolStack);
+            if (funcStack.size <= 0) {
+                return -1;
+            }
             if (currentFunc == (int)'!') {
                 a = ExecFunc(a, 0, currentFunc);
                 Push(&boolStack, a);
@@ -174,6 +170,14 @@ int Calc(char *input, int n) {
         } else if (IsFunc(input[i])) {
             Push(&funcStack, (int)input[i]);
         }
+        printf("values = ");
+        PrintStack(boolStack);
+        printf("functions = ");
+        PrintStack(funcStack);
+        printf("bracketsStack = ");
+        PrintStack(bracketsStack);
+        printf("symbol = %c\n", input[i]);
+        printf("\n\n");
     }
     return Pop(&boolStack);
 }

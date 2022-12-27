@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5.1)
-project(lab3-0 C)
+project(lab1-1 C)
 
-set(SRC src/main.c src/sort.h src/sort.c)
+set(SRC src/main.c src/search.h src/search.c src/utils.h src/utils.c)
 
 add_executable(${PROJECT_NAME} ${SRC})
 
